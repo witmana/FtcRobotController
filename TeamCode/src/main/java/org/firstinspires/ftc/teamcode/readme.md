@@ -1,3 +1,11 @@
+//Q's for Darren
+best practices for static variables, even if there is only one instance of a class? For example, should the liftMode String be Static?
+any point in making final variables public?
+= null designation?
+switch vs. if else?
+enum vs. string?
+
+
 ## TeamCode Module
 
 Welcome!
