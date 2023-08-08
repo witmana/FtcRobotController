@@ -33,23 +33,24 @@ public class Turret {
     public static final double TURRET_MAX_VEL = 200; //700 before change
     public static final double TURRET_MAX_OUT = 0.95;
 
-    public enum TurretMode{
+    public enum TurretMode {
         MANUAL,
         TOCONE,
         TOJUNCTION
     }
+
     public static TurretMode turretMode = TurretMode.TOCONE;
 
     PIDController turretPID;
 
-    public Orientation lastAngles = new Orientation ();
+    public Orientation lastAngles = new Orientation();
     public double globalAngle;
 
-    double startingAngle;
-    double targetAngle;
-    double angleDifference;
+    public double startingAngle;
+    public double targetAngle;
+    public double angleDifference;
 
-    public Turret (LinearOpMode opmode) {
+    public Turret(LinearOpMode opmode) {
         myOpMode = opmode;
     }
 
@@ -61,11 +62,11 @@ public class Turret {
 
         imu = myOpMode.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         imu.initialize(parameters);
 
         //turret.setZeroPowerBehavior(CRServo.ZeroPowerBehavior.BRAKE);
@@ -77,63 +78,60 @@ public class Turret {
             turretMode = TurretMode.MANUAL;
         }
 
-        if(turretMode == TurretMode.MANUAL) {
-            turret.setPower(-myOpMode.gamepad2.right_stick_x/2);
-        }
-        else if(turretMode == TurretMode.TOCONE) {
+        if (turretMode == TurretMode.MANUAL) {
+            turret.setPower(-myOpMode.gamepad2.right_stick_x / 2);
+        } else if (turretMode == TurretMode.TOCONE) {
             turretProfiledPIDNoLoop(targetAngle, startingAngle, runtime.seconds());
-        }
-        else if(turretMode == TurretMode.TOJUNCTION) {
+        } else if (turretMode == TurretMode.TOJUNCTION) {
             turretProfiledPIDNoLoop(targetAngle, startingAngle, runtime.seconds());
-        }
-        else {
+        } else {
             turret.setPower(0);
         }
     }
 
-    void turretProfiledPIDNoLoop(double angleTarget, double startingAngle, double time){
-        double angleDifference = angleTarget-startingAngle;
+    //should be revised to only require target as parameter
+    public void turretProfiledPIDNoLoop(double angleTarget, double startingAngle, double time) {
+        double angleDifference = angleTarget - startingAngle;
         double direction = 1;
-        if(angleDifference < 0){
-            direction =-1;
+        if (angleDifference < 0) {
+            direction = -1;
         }
 
-        double turretPower = turretPID.calculate(direction*motionProfile(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time)+startingAngle, getAngle());
+        double turretPower = turretPID.calculate(direction * motionProfile(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time) + startingAngle, getAngle());
 
         turret.setPower(turretPower);
 
         myOpMode.telemetry.addData("turretPower", turretPower);
         myOpMode.telemetry.addData("instantTarget", motionProfile(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time));
         myOpMode.telemetry.addData("profileTime", motionProfileTime(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time));
-        myOpMode.telemetry.addData("turretPosition" , getAngle());
+        myOpMode.telemetry.addData("turretPosition", getAngle());
 
         myOpMode.telemetry.update();
     }
 
-    void turretProfiledPID(float angleTarget){
+    public void turretProfiledPID(float angleTarget) {
         double startingAngle = getAngle();
-        double angleDifference = angleTarget-startingAngle;
+        double angleDifference = angleTarget - startingAngle;
         double direction = 1;
-        if(angleDifference < 0){
-            direction =-1;
+        if (angleDifference < 0) {
+            direction = -1;
         }
 
         ElapsedTime time = new ElapsedTime();
         time.reset();
 
 
-        while(myOpMode.opModeIsActive() &&
-                time.seconds() < 0.5 + motionProfileTime(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time.seconds()))
-        {
+        while (myOpMode.opModeIsActive() &&
+                time.seconds() < 0.5 + motionProfileTime(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time.seconds())) {
 
-            double turretPower = turretPID.calculate((direction*motionProfile(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time.seconds()))+startingAngle, getAngle());
+            double turretPower = turretPID.calculate((direction * motionProfile(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time.seconds())) + startingAngle, getAngle());
 
             turret.setPower(turretPower);
 
             myOpMode.telemetry.addData("turretPower", turretPower);
             myOpMode.telemetry.addData("instantTarget", motionProfile(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time.seconds()));
             myOpMode.telemetry.addData("profileTime", motionProfileTime(TURRET_MAX_ACC, TURRET_MAX_VEL, angleDifference, time.seconds()));
-            myOpMode.telemetry.addData("turretPosition" , getAngle());
+            myOpMode.telemetry.addData("turretPosition", getAngle());
 
             myOpMode.telemetry.update();
         }
@@ -141,7 +139,7 @@ public class Turret {
 
     }
 
-    public void turretToPositionPIDClass(double targetPosition){
+    public void turretToPositionPIDClass(double targetPosition) {
 
         double out = turretPID.calculate(targetPosition, getAngle());
 
@@ -150,14 +148,12 @@ public class Turret {
 
     }
 
-    private void resetAngle()
-    {
-        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC,AxesOrder.ZYX, AngleUnit.DEGREES);
+    private void resetAngle() {
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         globalAngle = 0;
     }
 
-    public double getAngle()
-    {
+    public double getAngle() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
 
@@ -166,16 +162,16 @@ public class Turret {
         else if (deltaAngle > 180)
             deltaAngle -= 360;
 
-        globalAngle +=deltaAngle;
+        globalAngle += deltaAngle;
 
         lastAngles = angles;
 
         return globalAngle;
     }
 
-    void newTarget(double target){
-        startingAngle = getAngle();;
+    public void newTarget(double target) {
+        startingAngle = getAngle();
         targetAngle = target;
-        angleDifference = targetAngle-startingAngle;
+        angleDifference = targetAngle - startingAngle;
     }
 }

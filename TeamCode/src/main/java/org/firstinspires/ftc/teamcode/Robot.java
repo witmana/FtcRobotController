@@ -14,13 +14,12 @@ public class Robot {
     public Turret turret;
     public Lift lift;
 
-
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public Robot(LinearOpMode opmode) {
         myOpMode = opmode;
     }
 
-    public void init(){
+    public void init() {
         drivetrain = new Drivetrain(myOpMode);
         scoring = new Scoring(myOpMode);
         turret = new Turret(myOpMode);
@@ -35,17 +34,16 @@ public class Robot {
         myOpMode.telemetry.update();
     }
 
-    void teleOp(){
+    public void teleOp() {
         drivetrain.teleOp();
         lift.teleOp();
         turret.teleOp();
         scoring.teleOp();
     }
 
-    public void deliver()
-    {
+    public void deliver() {
         scoring.pivot.setPosition(scoring.CLAW_HOVER);
-        scoring.extension.setPosition(scoring.EXTENSION_OUT-0.2);
+        scoring.extension.setPosition(scoring.EXTENSION_OUT - 0.2);
         myOpMode.sleep(500);
         scoring.claw.setPosition(scoring.CLAW_OPEN);
         myOpMode.sleep(250);
@@ -53,11 +51,10 @@ public class Robot {
         myOpMode.sleep(500);
     }
 
-    public void retrieve()
-    {
+    public void retrieve() {
         scoring.pivot.setPosition(scoring.CLAW_DOWN);
         myOpMode.sleep(250);
-        scoring.extension.setPosition(scoring.EXTENSION_OUT-0.24);
+        scoring.extension.setPosition(scoring.EXTENSION_OUT - 0.24);
         myOpMode.sleep(500);
         scoring.claw.setPosition(scoring.CLAW_CLOSED);
         myOpMode.sleep(250);
@@ -67,15 +64,11 @@ public class Robot {
         myOpMode.sleep(400); //new one
     }
 
-
-
-    public void toJunctionLeft()
-    {
+    public void toJunctionLeft() {
         runtime.reset();
         scoring.pivot.setPosition(scoring.CLAW_HOVER);
         turret.newTarget(180);
-        while(runtime.seconds() < 2.25)
-        {
+        while (runtime.seconds() < 2.25) {
             scoring.extension.setPosition(scoring.EXTENSION_IN);
             turret.turretProfiledPIDNoLoop(turret.targetAngle, turret.startingAngle, runtime.seconds());
             lift.liftToPositionPIDClass(3600);//3300
@@ -85,12 +78,10 @@ public class Robot {
         turret.turretPID.reset();
     }
 
-    public void toStackLeft(int liftHeight)
-    {
+    public void toStackLeft(int liftHeight) {
         runtime.reset();
         turret.newTarget(-30.0);
-        while(runtime.seconds() < 1.75)
-        {
+        while (runtime.seconds() < 1.75) {
             scoring.extension.setPosition(scoring.EXTENSION_IN);
             turret.turretProfiledPIDNoLoop(turret.targetAngle, turret.startingAngle, runtime.seconds());
             scoring.pivot.setPosition(scoring.CLAW_UP);
@@ -100,13 +91,11 @@ public class Robot {
         turret.turret.setPower(0);
     }
 
-    public void toJunctionRight()
-    {
+    public void toJunctionRight() {
         runtime.reset();
         scoring.pivot.setPosition(scoring.CLAW_HOVER);
         turret.newTarget(-62.0);
-        while(runtime.seconds() < 2.25)
-        {
+        while (runtime.seconds() < 2.25) {
             turret.turretProfiledPIDNoLoop(turret.targetAngle, turret.startingAngle, runtime.seconds());
             lift.liftToPositionPIDClass(3600);
         }
@@ -114,12 +103,10 @@ public class Robot {
         turret.turretPID.reset();
     }
 
-    public void toStackRight(int liftHeight)
-    {
+    public void toStackRight(int liftHeight) {
         runtime.reset();
         turret.newTarget(150.0);
-        while(runtime.seconds() < 1.75)
-        {
+        while (runtime.seconds() < 1.75) {
             scoring.extension.setPosition(scoring.EXTENSION_IN);
             turret.turretProfiledPIDNoLoop(turret.targetAngle, turret.startingAngle, runtime.seconds());
             scoring.pivot.setPosition(scoring.CLAW_UP);

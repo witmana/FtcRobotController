@@ -1,11 +1,15 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Lift;
+import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.Turret;
+
 public class TeleOpLeft extends LinearOpMode {
 
-    Robot   robot       = new Robot(this);
+    Robot robot = new Robot(this);
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
@@ -21,11 +25,9 @@ public class TeleOpLeft extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-
         while (opModeIsActive()) {
 
-            if(gamepad2.a)
-            {
+            if (gamepad2.a) {
                 robot.turret.turretMode = Turret.TurretMode.TOCONE;
                 robot.turret.newTarget(10.0);
                 runtime.reset();
@@ -34,8 +36,7 @@ public class TeleOpLeft extends LinearOpMode {
                 robot.scoring.pivotPosition = robot.scoring.CLAW_DOWN;
                 robot.scoring.extensionPosition = robot.scoring.EXTENSION_MID;
             }
-            if(gamepad2.b)
-            {
+            if (gamepad2.b) {
                 robot.turret.turretMode = Turret.TurretMode.TOJUNCTION;
                 robot.turret.newTarget(148.0);
                 runtime.reset();
@@ -44,15 +45,13 @@ public class TeleOpLeft extends LinearOpMode {
                 robot.scoring.pivotPosition = robot.scoring.CLAW_HOVER;
                 robot.scoring.extensionPosition = robot.scoring.EXTENSION_MID;
             }
-            if(gamepad2.x)
-            {
+            if (gamepad2.x) {
                 robot.scoring.pivotPosition = robot.scoring.CLAW_UP;
                 robot.scoring.extensionPosition = robot.scoring.EXTENSION_IN;
                 robot.lift.liftMode = Lift.LiftMode.GROUND;
                 robot.lift.resetLiftPID();
             }
-            if(gamepad2.y)
-            {
+            if (gamepad2.y) {
                 robot.turret.turretMode = Turret.TurretMode.TOJUNCTION;
                 robot.turret.newTarget(200.0);
                 runtime.reset();

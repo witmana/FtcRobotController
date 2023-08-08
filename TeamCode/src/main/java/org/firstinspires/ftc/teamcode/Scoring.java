@@ -13,24 +13,24 @@ public class Scoring {
     public Servo pivot = null;
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
-    public static final double CLAW_UP      = 0.9;
-    public static final double CLAW_DOWN    = 0.05;
-    public static final double CLAW_HOVER   = 0.3;
-    public static final double CLAW_OPEN    = 0.6;
-    public static final double CLAW_CLOSED  = 0.2;
-    public static final double EXTENSION_IN  = 0.6;
-    public static final double EXTENSION_MID  = 0.4;
-    public static final double EXTENSION_OUT  = 0.25;
+    public static final double CLAW_UP = 0.9;
+    public static final double CLAW_DOWN = 0.05;
+    public static final double CLAW_HOVER = 0.3;
+    public static final double CLAW_OPEN = 0.6;
+    public static final double CLAW_CLOSED = 0.2;
+    public static final double EXTENSION_IN = 0.6;
+    public static final double EXTENSION_MID = 0.4;
+    public static final double EXTENSION_OUT = 0.25;
 
-    double extensionPosition;
-    double pivotPosition;
-    double clawPosition;
+    public double extensionPosition;
+    public double pivotPosition;
+    public double clawPosition;
 
     public Scoring(LinearOpMode opmode) {
         myOpMode = opmode;
     }
 
-    public void init(){
+    public void init() {
         claw = myOpMode.hardwareMap.get(Servo.class, "claw");
         extension = myOpMode.hardwareMap.get(Servo.class, "extension");
         pivot = myOpMode.hardwareMap.get(Servo.class, "pivot");
@@ -46,7 +46,7 @@ public class Scoring {
         myOpMode.telemetry.addData(">", "Extension Initialized");
     }
 
-    public void teleOp(){
+    public void teleOp() {
         //send positions
         claw.setPosition(clawPosition);
         pivot.setPosition(pivotPosition);
@@ -55,36 +55,34 @@ public class Scoring {
         myOpMode.telemetry.addData("Extension: ", extensionPosition);
 
         //set positions
-        if(myOpMode.gamepad2.right_bumper)
-        {
+        if (myOpMode.gamepad2.right_bumper) {
             clawPosition = CLAW_OPEN;
-        }
-        else
+        } else {
             clawPosition = CLAW_CLOSED;
+        }
 
-        if(myOpMode.gamepad2.dpad_up)
-        {
+        if (myOpMode.gamepad2.dpad_up) {
             pivotPosition = CLAW_UP;
         }
-        if(myOpMode.gamepad2.dpad_right)
-        {
+
+        if (myOpMode.gamepad2.dpad_right) {
             pivotPosition = CLAW_HOVER;
         }
-        if(myOpMode.gamepad2.dpad_down)
-        {
+
+        if (myOpMode.gamepad2.dpad_down) {
             pivotPosition = CLAW_DOWN;
         }
-        if(myOpMode.gamepad2.x)
-        {
+
+        if (myOpMode.gamepad2.x) {
             extensionPosition = EXTENSION_IN;
         }
-        if(myOpMode.gamepad2.left_stick_y > 0 && extensionPosition < 0.6)
-        {
-            extensionPosition+=0.05;
+
+        if (myOpMode.gamepad2.left_stick_y > 0 && extensionPosition < 0.6) {
+            extensionPosition += 0.05;
         }
-        if(myOpMode.gamepad2.left_stick_y < 0 && extensionPosition > 0)
-        {
-            extensionPosition-=0.05;
+
+        if (myOpMode.gamepad2.left_stick_y < 0 && extensionPosition > 0) {
+            extensionPosition -= 0.05;
         }
     }
 }

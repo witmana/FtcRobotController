@@ -31,6 +31,7 @@ public class Lift {
         LOW,
         GROUND
     }
+
     public LiftMode liftMode = LiftMode.MANUAL;
 
     public Lift(LinearOpMode opmode) {
@@ -91,20 +92,17 @@ public class Lift {
             }
         } else if (liftMode == LiftMode.HIGH) {
             liftToPositionPIDClass(3700);
-        }
-        else if (liftMode == LiftMode.MEDIUM) {
+        } else if (liftMode == LiftMode.MEDIUM) {
             liftToPositionPIDClass(2284);
-        }
-        else if (liftMode == LiftMode.LOW) {
+        } else if (liftMode == LiftMode.LOW) {
             liftToPositionPIDClass(1409);
-        }
-        else if (liftMode == LiftMode.GROUND) {
+        } else if (liftMode == LiftMode.GROUND) {
             resetLift(-0.8);
         }
     }
 
     //functions specific to lift
-    public void liftToPositionPIDClass(double targetPosition){
+    public void liftToPositionPIDClass(double targetPosition) {
         double outLeft = liftLeftPID.calculate(targetPosition, liftLeft.getCurrentPosition());
         double outRight = liftRightPID.calculate(targetPosition, liftRight.getCurrentPosition());
 
@@ -115,24 +113,20 @@ public class Lift {
         myOpMode.telemetry.addData("LiftRightPower: ", outRight);
     }
 
-    public void resetLift(double speed)
-    {
+    public void resetLift(double speed) {
         liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        if(touch.isPressed() == false){
+        if (touch.isPressed() == false) {
             liftLeft.setPower(speed);
             liftRight.setPower(speed);
-        }
-        else
-        {
+        } else {
             liftLeft.setPower(0);
             liftRight.setPower(0);
         }
 
     }
 
-    public void resetLiftPID()
-    {
+    public void resetLiftPID() {
         liftLeftPID.reset();
         liftRightPID.reset();
     }
