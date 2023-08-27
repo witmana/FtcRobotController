@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+//General template for a subsystem class
+
 public class Subsystem {
     /* Declare OpMode members. */
 
