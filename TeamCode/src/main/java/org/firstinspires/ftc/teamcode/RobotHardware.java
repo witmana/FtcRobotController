@@ -136,6 +136,17 @@ public class RobotHardware {
         // leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //Reset the motor encoders so they start from 0
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         // Define and initialize ALL installed servos.
         //Ex. leftHand = myOpMode.hardwareMap.get(Servo.class, "left_hand");
         //Ex. leftHand.setPosition(MID_SERVO);
@@ -168,6 +179,8 @@ public class RobotHardware {
         // Now initialize the IMU with this mounting orientation
         // Note: if you choose two conflicting directions, this initialization will cause a code exception.
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+
+        imu.resetYaw();
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
@@ -255,12 +268,15 @@ public class RobotHardware {
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (myOpMode.opModeIsActive() &&
                     (timeout.seconds() < timeoutS) &&
-                    (leftFrontDrive.isBusy() && leftBackDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy())) {
+                    (leftFrontDrive.isBusy() || leftBackDrive.isBusy() || rightFrontDrive.isBusy() || rightBackDrive.isBusy())) {
 
                 // Display it for the driver.
-                myOpMode.telemetry.addData("Running to",  " %7d :%7d", targetCounts);
-                myOpMode.telemetry.addData("Currently at",  " at %7d :%7d",
-                        leftFrontDrive.getCurrentPosition());
+                myOpMode.telemetry.addData("Running to", targetCounts);
+                myOpMode.telemetry.addData("LeftFront at", leftFrontDrive.getCurrentPosition());
+                myOpMode.telemetry.addData("LeftBack at", leftBackDrive.getCurrentPosition());
+                myOpMode.telemetry.addData("RightFront at", rightFrontDrive.getCurrentPosition());
+                myOpMode.telemetry.addData("RightBack at", rightBackDrive.getCurrentPosition());
+                myOpMode.telemetry.update();
             }
 
             // Stop all motion;
@@ -283,6 +299,8 @@ public class RobotHardware {
     //Sample code for turning using the IMU (Inertial measurement unit) found in the Control Hub
     //Challenge: could you make one that turns Counter Clock Wise?
     public void turnCW (double motorPower, double degrees){
+        //optionally reset imu heading - don't do this if you need field coordinates
+        imu.resetYaw();
         // Retrieve Rotational Angles and Velocities
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
 
@@ -296,7 +314,7 @@ public class RobotHardware {
         rightBackDrive.setPower(-motorPower);
 
         //update orientation and check angle
-        while (targetAngle < orientation.getYaw(AngleUnit.DEGREES)){
+        while (myOpMode.opModeIsActive() && targetAngle < orientation.getYaw(AngleUnit.DEGREES)){
             // Update Rotational Angles
             orientation = imu.getRobotYawPitchRollAngles();
 
@@ -310,5 +328,16 @@ public class RobotHardware {
         leftBackDrive.setPower(0);
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
+    }
+
+    public void checkTelemetry(){
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+
+        myOpMode.telemetry.addData("IMU position: ", orientation.getYaw(AngleUnit.DEGREES));
+        myOpMode.telemetry.addData("LeftFront at", leftFrontDrive.getCurrentPosition());
+        myOpMode.telemetry.addData("LeftBack at", leftBackDrive.getCurrentPosition());
+        myOpMode.telemetry.addData("RightFront at", rightFrontDrive.getCurrentPosition());
+        myOpMode.telemetry.addData("RightBack at", rightBackDrive.getCurrentPosition());
+        myOpMode.telemetry.update();
     }
 }
