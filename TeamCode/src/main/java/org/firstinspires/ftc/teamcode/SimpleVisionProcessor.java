@@ -12,6 +12,10 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+//You can change the locations of the regions of interest by adjusting the Rect coordinates below
+//The units are in pixels, with the origin in the top left corner (like Processing)
+//For reference, most FTC cameras default to 640 width and 480 height
+
 public class SimpleVisionProcessor implements VisionProcessor {
     public Rect rectLeft = new Rect(110, 42, 40, 40);
     public Rect rectMiddle = new Rect(160, 42, 40, 40);
@@ -69,7 +73,7 @@ public class SimpleVisionProcessor implements VisionProcessor {
         android.graphics.Rect drawRectangleLeft = makeGraphicsRect(rectLeft, scaleBmpPxToCanvasPx);
         android.graphics.Rect drawRectangleMiddle = makeGraphicsRect(rectMiddle, scaleBmpPxToCanvasPx);
         android.graphics.Rect drawRectangleRight = makeGraphicsRect(rectRight, scaleBmpPxToCanvasPx);
-        
+
         selection = (Selected) userContext;
         switch (selection) {
             case LEFT:
