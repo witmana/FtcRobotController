@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Utility.PIDController;
 import org.firstinspires.ftc.teamcode.Utility.PinPointLocalizer;
 import org.firstinspires.ftc.teamcode.Utility.Pose2D;
+import org.firstinspires.ftc.teamcode.Utility.SparkfunLocalizer;
 
 public class Drivetrain {
     /* Declare OpMode members. */
@@ -17,8 +18,8 @@ public class Drivetrain {
     //TODO: Declare OpMode member for the Odometry System
     // If using GoBilda Pinpoint computer then use PinPointLocalizer class
     // If using Sparkfun OTOS then use SparfunLocalizer class
-    public PinPointLocalizer localizer;
-    //SparkfunLocalizer localizer;
+    //public PinPointLocalizer localizer;
+    public SparkfunLocalizer localizer;
 
     ElapsedTime time = new ElapsedTime();
 
@@ -34,7 +35,7 @@ public class Drivetrain {
     PIDController yPID;
     PIDController headingPID;
 
-    public boolean isBusy = false;
+    public boolean targetReached = false;
     Pose2D targetPose;
 
     //Static Variables
@@ -64,8 +65,8 @@ public class Drivetrain {
         headingPID.maxOut = DRIVE_MAX_OUT;
 
         //TODO Change constructor based on localization system
-        localizer = new PinPointLocalizer(myOpMode);
-        //localizer = new SparkfunLocalizer(myOpMode);
+        //localizer = new PinPointLocalizer(myOpMode);
+        localizer = new SparkfunLocalizer(myOpMode);
 
         localizer.init();
 
@@ -185,19 +186,19 @@ public class Drivetrain {
         rightBackDrive.setPower(xPower_rotated - yPower_rotated + tPower);
 
         //check if drivetrain is still working towards target
-        isBusy = xPID.isBusy || yPID.isBusy || headingPID.isBusy;
+        targetReached = xPID.targetReached && yPID.targetReached && headingPID.targetReached;
 
         localizer.update();
     }
 
     public void setTargetPose(Pose2D newTarget){
         targetPose = newTarget;
-        isBusy = true;
+        targetReached = false;
     }
 
     public void driveToPose(double xTarget, double yTarget, double degreeTarget) {
         //check if drivetrain is still working towards target
-        isBusy = xPID.isBusy || yPID.isBusy || headingPID.isBusy;
+        targetReached = xPID.targetReached && yPID.targetReached && headingPID.targetReached;
         //double thetaTarget = Math.toRadians(degreeTarget);
         //Use PIDs to calculate motor powers based on error to targets
         double xPower = xPID.calculate(xTarget, localizer.pos.getX(DistanceUnit.INCH));

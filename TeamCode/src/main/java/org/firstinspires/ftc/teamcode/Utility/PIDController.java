@@ -22,7 +22,7 @@ public class PIDController {
     double previousFilterEstimate = 0;
     double currentFilterEstimate = 0;
     double a = 0.5;
-    public boolean isBusy;
+    public boolean targetReached;
 
 
     public PIDController(double kpIn, double kiIn, double kdIn){
@@ -37,7 +37,7 @@ public class PIDController {
         double error = reference - currentPosition;
 
         //check if target is reached
-        isBusy = Math.abs(error) > errorMargin;
+        targetReached = Math.abs(error) < errorMargin;
 
         // rate of change of the error
         double errorChange = (error - lastError);
