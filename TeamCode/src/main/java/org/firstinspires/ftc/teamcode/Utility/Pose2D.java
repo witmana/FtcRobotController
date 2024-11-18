@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.Utility;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class Pose2D extends SparkFunOTOS.Pose2D {
+public class Pose2D {
     private final double x;
     private final double y;
     private final DistanceUnit distanceUnit;

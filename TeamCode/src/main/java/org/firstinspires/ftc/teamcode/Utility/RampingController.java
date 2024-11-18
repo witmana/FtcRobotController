@@ -49,5 +49,5 @@ public class RampingController {
     public boolean isTargetReached() {
         return targetReached;
     }
-
+    
 }

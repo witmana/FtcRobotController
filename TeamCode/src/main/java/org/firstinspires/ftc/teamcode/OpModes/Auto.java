@@ -46,9 +46,9 @@ public class Auto extends LinearOpMode {
 
         //TODO Pass starting pose to localizer
         //for Gobilda it looks like this
-        //robot.drivetrain.localizer.odo.setPosition(startPose);
+        robot.drivetrain.localizer.odo.setPosition(startPose);
         //for sparkfun it looks like this
-        robot.drivetrain.localizer.myOtos.setPosition(startPose);
+        //robot.drivetrain.localizer.myOtos.setPosition(startPose);
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Waiting for Start");
@@ -64,7 +64,7 @@ public class Auto extends LinearOpMode {
                     robot.pivot.pivotMode = Pivot.PivotMode.PIVOT_HIGH_CHAMBER;
                     robot.scoring.wrist.setPosition(Scoring.WRIST_OUT);
                     //put condition for switch at the end, condition can be based on time or completion of a task
-                    if(robot.drivetrain.targetReached){
+                    if(!robot.drivetrain.isBusy){
                         currentState = State.DELIVER_SPECIMEN;
                         timer.reset();
                     }
@@ -80,7 +80,7 @@ public class Auto extends LinearOpMode {
                     robot.pivot.pivotMode = Pivot.PivotMode.PIVOT_SUBMERSIBLE;
                     robot.scoring.wrist.setPosition(Scoring.WRIST_MID);
                     robot.scoring.claw.setPosition(Scoring.CLAW_OPEN);
-                    if(robot.drivetrain.targetReached){
+                    if(!robot.drivetrain.isBusy){
                         currentState = State.IDLE;
                     }
                     break;

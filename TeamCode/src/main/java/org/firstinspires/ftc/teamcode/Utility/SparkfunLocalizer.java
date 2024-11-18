@@ -13,8 +13,7 @@ import org.firstinspires.ftc.teamcode.RoadRunner.Drawing;
 public class SparkfunLocalizer {
 
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
-    public SparkFunOTOS myOtos;
-    public Pose2D pos;
+    SparkFunOTOS myOtos;
 
     public SparkfunLocalizer(LinearOpMode opmode) {
         myOpMode = opmode;
@@ -103,17 +102,17 @@ public class SparkfunLocalizer {
     public void update(){
         // Get the latest position, which includes the x and y coordinates, plus the
         // heading angle
-        pos = (Pose2D) myOtos.getPosition();
+        SparkFunOTOS.Pose2D pos = myOtos.getPosition();
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.fieldOverlay().setStroke("#3F51B5");
-        Drawing.drawRobot(packet.fieldOverlay(), new Pose2d(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), Math.toRadians(pos.getHeading(AngleUnit.RADIANS))));
+        Drawing.drawRobot(packet.fieldOverlay(), new Pose2d(pos.x, pos.y, Math.toRadians(pos.h)));
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
         // Log the position to the telemetry
-        myOpMode.telemetry.addData("X coordinate", pos.getX(DistanceUnit.INCH));
-        myOpMode.telemetry.addData("Y coordinate", pos.getY(DistanceUnit.INCH));
-        myOpMode.telemetry.addData("Heading angle", pos.getHeading(AngleUnit.DEGREES));
+        myOpMode.telemetry.addData("X coordinate", pos.x);
+        myOpMode.telemetry.addData("Y coordinate", pos.y);
+        myOpMode.telemetry.addData("Heading angle", pos.h);
     }
 
 
