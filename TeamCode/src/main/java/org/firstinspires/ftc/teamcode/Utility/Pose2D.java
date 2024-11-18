@@ -24,4 +24,5 @@ public class Pose2D {
     public double getHeading(AngleUnit unit) {
         return unit.fromUnit(this.headingUnit, heading);
     }
+
 }

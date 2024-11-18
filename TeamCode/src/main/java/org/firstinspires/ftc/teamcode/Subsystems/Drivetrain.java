@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Utility.PIDController;
 import org.firstinspires.ftc.teamcode.Utility.PinPointLocalizer;
+import org.firstinspires.ftc.teamcode.Utility.Pose2D;
 
 public class Drivetrain {
     /* Declare OpMode members. */
@@ -20,7 +21,7 @@ public class Drivetrain {
     //SparkfunLocalizer localizer;
 
     ElapsedTime time = new ElapsedTime();
-    public boolean isBusy = false;
+
 
     //drivetrain motors
     public DcMotor rightFrontDrive = null;
@@ -32,6 +33,9 @@ public class Drivetrain {
     PIDController xPID;
     PIDController yPID;
     PIDController headingPID;
+
+    public boolean isBusy = false;
+    Pose2D targetPose;
 
     //Static Variables
     //TODO Adjust drive constants based on auto performance
@@ -161,7 +165,34 @@ public class Drivetrain {
     }
 
     public void update(){
+
+        //double thetaTarget = Math.toRadians(degreeTarget);
+        //Use PIDs to calculate motor powers based on error to targets
+        double xPower = xPID.calculate(targetPose.getX(DistanceUnit.INCH), localizer.pos.getX(DistanceUnit.INCH));
+        double yPower = yPID.calculate(targetPose.getY(DistanceUnit.INCH), localizer.pos.getY(DistanceUnit.INCH));
+
+        //double wrappedAngle = angleWrap(thetaTarget - localizer.heading);
+        double tPower = headingPID.calculate(targetPose.getHeading(AngleUnit.DEGREES),localizer.pos.getHeading(AngleUnit.DEGREES));
+
+        //rotate the motor powers based on robot heading
+        double xPower_rotated = xPower * Math.cos(-localizer.pos.getHeading(AngleUnit.DEGREES)) - yPower * Math.sin(-localizer.pos.getHeading(AngleUnit.DEGREES));
+        double yPower_rotated = xPower * Math.sin(-localizer.pos.getHeading(AngleUnit.DEGREES)) + yPower * Math.cos(-localizer.pos.getHeading(AngleUnit.DEGREES));
+
+        // x, y, theta input mixing to deliver motor powers
+        leftFrontDrive.setPower(xPower_rotated - yPower_rotated - tPower);
+        leftBackDrive.setPower(xPower_rotated + yPower_rotated - tPower);
+        rightFrontDrive.setPower(xPower_rotated + yPower_rotated + tPower);
+        rightBackDrive.setPower(xPower_rotated - yPower_rotated + tPower);
+
+        //check if drivetrain is still working towards target
+        isBusy = xPID.isBusy || yPID.isBusy || headingPID.isBusy;
+
         localizer.update();
+    }
+
+    public void setTargetPose(Pose2D newTarget){
+        targetPose = newTarget;
+        isBusy = true;
     }
 
     public void driveToPose(double xTarget, double yTarget, double degreeTarget) {
