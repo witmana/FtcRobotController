@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Subsystems.RobotHardware;
 import org.firstinspires.ftc.teamcode.Subsystems.TestBotHardware;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TestBotTeleOp", group="Linear OpMode")
+//@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TestBotTeleOp", group="Linear OpMode")
 public class TestBotTeleOp extends LinearOpMode {
 
     //declaring instance of robot hardware
