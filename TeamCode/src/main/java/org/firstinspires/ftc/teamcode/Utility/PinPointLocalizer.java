@@ -95,4 +95,16 @@ public class PinPointLocalizer {
         myOpMode.telemetry.addData("Position", data);
     }
 
+    public double getX(){
+        return pos.getX(DistanceUnit.INCH);
+    }
+
+    public double getY(){
+        return pos.getY(DistanceUnit.INCH);
+    }
+
+    public double getHeading(){
+        return pos.getHeading(AngleUnit.DEGREES);
+    }
+
 }

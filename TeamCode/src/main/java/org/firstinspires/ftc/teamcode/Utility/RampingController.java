@@ -7,7 +7,7 @@ public class RampingController {
     private double rampDownRate;
     private double threshold;
 
-    private boolean targetReached;
+    public boolean targetReached;
 
     public RampingController(double maxSpeed, double minSpeed,
                              double rampUpRate, double rampDownRate, double threshold) {
@@ -19,7 +19,7 @@ public class RampingController {
         this.targetReached = false;
     }
 
-    public double calculateMotorPower(double targetPosition, double currentPosition) {
+    public double calculate(double targetPosition, double currentPosition) {
         double distanceToTarget = Math.abs(targetPosition - currentPosition);
         double direction = Math.signum(targetPosition - currentPosition);
 

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 public class TestBotHardware {
         /* Declare OpMode members. */
@@ -10,7 +12,7 @@ public class TestBotHardware {
         ElapsedTime runtime = new ElapsedTime();
 
         //TODO Add instance of Vision subsystem...either Webcam, HuskyLens, or Limelight
-        public Drivetrain drivetrain;
+        public TestBotDrivetrain drivetrain;
 
 
         // Define a constructor that allows the OpMode to pass a reference to itself.
@@ -19,11 +21,9 @@ public class TestBotHardware {
         }
 
         public void init() {
-            drivetrain = new Drivetrain(myOpMode);
-
+            drivetrain = new TestBotDrivetrain(myOpMode);
 
             drivetrain.init();
-
 
             myOpMode.telemetry.addData(">", "Hardware Initialized");
         }
