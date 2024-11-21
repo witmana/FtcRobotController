@@ -52,10 +52,8 @@ public class Lift {
 
     public void init() {
 
-        leftLiftPID = new PIDController(LIFT_KP, LIFT_KI, LIFT_KD);
-        rightLiftPID = new PIDController(LIFT_KP, LIFT_KI, LIFT_KD);
-        leftLiftPID.maxOut = LIFT_MAX_POWER;
-        rightLiftPID.maxOut = LIFT_MAX_POWER;
+        leftLiftPID = new PIDController(LIFT_KP, LIFT_KI, LIFT_KD,LIFT_MAX_POWER);
+        rightLiftPID = new PIDController(LIFT_KP, LIFT_KI, LIFT_KD,LIFT_MAX_POWER);
 
         leftLift = myOpMode.hardwareMap.get(DcMotor.class, "leftLift");
         rightLift = myOpMode.hardwareMap.get(DcMotor.class, "rightLift");

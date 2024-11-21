@@ -26,10 +26,11 @@ public class PIDController {
     public boolean targetReached;
 
 
-    public PIDController(double kpIn, double kiIn, double kdIn){
+    public PIDController(double kpIn, double kiIn, double kdIn, double maxOutIn){
         Kp = kpIn;
         Ki = kiIn;
         Kd = kdIn;
+        maxOut = maxOutIn;
     }
 
     public double calculate(double reference, double currentPosition){

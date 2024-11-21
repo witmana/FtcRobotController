@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TestBot;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -52,7 +53,7 @@ public class TestBotDrivetrain {
     public static double DRIVE_KD = 0.01;//0.0003;
     public static double DRIVE_MAX_ACC = 2000;
     public static double DRIVE_MAX_VEL = 3500;
-    public static double DRIVE_MAX_OUT = 0.95;
+    public static double DRIVE_MAX_OUT = 0.7;
 
     /*
     public static double MAX_SPEED = .5;
@@ -77,9 +78,9 @@ public class TestBotDrivetrain {
         //xController = new RampingController(MAX_SPEED, MIN_SPEED, RAMP_UP_RATE, RAMP_DOWN_RATE, THRESHOLD);
         //yController = new RampingController(MAX_SPEED, MIN_SPEED, RAMP_UP_RATE, RAMP_DOWN_RATE, THRESHOLD);
         //headingController = new RampingController(MAX_SPEED, MIN_SPEED, RAMP_UP_RATE, RAMP_DOWN_RATE, THRESHOLD);
-        xController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD);
-        yController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD);
-        headingController = new PIDController(HEADING_KP,HEADING_KI,HEADING_KD);
+        xController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD, DRIVE_MAX_OUT);
+        yController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD,DRIVE_MAX_OUT);
+        headingController = new PIDController(HEADING_KP,HEADING_KI,HEADING_KD,DRIVE_MAX_OUT);
 
         //TODO Change constructor based on localization system
         //localizer = new PinPointLocalizer(myOpMode);
@@ -88,7 +89,8 @@ public class TestBotDrivetrain {
         localizer.init();
 
         //TODO Set the offset of the localizer sensor
-        localizer.myOtos.setOffset(new Pose2D(DistanceUnit.INCH,0,5,AngleUnit.DEGREES,0));
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(5, 0, 0);
+        localizer.myOtos.setOffset(offset);
 
         leftFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "leftFrontDrive");
         rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "rightFrontDrive");

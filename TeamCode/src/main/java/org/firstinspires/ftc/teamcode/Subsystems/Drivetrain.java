@@ -58,9 +58,9 @@ public class Drivetrain {
 
     public void init() {
         //Initialize PID controllers
-        xPID = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD);
-        yPID = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD);
-        headingPID = new PIDController(HEADING_KP, HEADING_KI, HEADING_KD);
+        xPID = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, DRIVE_MAX_OUT);
+        yPID = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, DRIVE_MAX_OUT);
+        headingPID = new PIDController(HEADING_KP, HEADING_KI, HEADING_KD,DRIVE_MAX_OUT);
 
         xPID.maxOut = DRIVE_MAX_OUT;
         yPID.maxOut = DRIVE_MAX_OUT;
