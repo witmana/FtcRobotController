@@ -1,9 +1,6 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.TestBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.Subsystems.RobotHardware;
-import org.firstinspires.ftc.teamcode.Subsystems.TestBotHardware;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TestBotTeleOp", group="Linear OpMode")
 public class TestBotTeleOp extends LinearOpMode {
@@ -27,6 +24,7 @@ public class TestBotTeleOp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             robot.teleOp();
+            telemetry.addData("leftStickY", gamepad1.left_stick_y);
             telemetry.update();
         }
     }

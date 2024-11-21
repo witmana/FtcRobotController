@@ -18,6 +18,7 @@ public class PIDController {
     double integralSum = 0;
     double integralCap = 0.25;
     public double maxOut = 0.4;
+    public double minOut = 0.1;
     double errorMargin = 1;
     double previousFilterEstimate = 0;
     double currentFilterEstimate = 0;
@@ -68,6 +69,9 @@ public class PIDController {
     }
 
     public double calculate(double error){
+
+        //check if target is reached
+        targetReached = Math.abs(error) < errorMargin;
 
         // rate of change of the error
         double errorChange = (error - lastError);

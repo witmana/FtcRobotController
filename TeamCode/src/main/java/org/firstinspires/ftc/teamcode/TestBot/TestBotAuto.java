@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.TestBot;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -7,12 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Subsystems.Lift;
-import org.firstinspires.ftc.teamcode.Subsystems.Pivot;
-import org.firstinspires.ftc.teamcode.Subsystems.RobotHardware;
-import org.firstinspires.ftc.teamcode.Subsystems.Scoring;
-import org.firstinspires.ftc.teamcode.Subsystems.TestBotHardware;
 import org.firstinspires.ftc.teamcode.Utility.Pose2D;
+
 @Autonomous(name="TestBotAuto", group="Linear OpMode")
 @Config
 public class TestBotAuto extends LinearOpMode {
@@ -36,9 +32,14 @@ public class TestBotAuto extends LinearOpMode {
     State currentState = State.DRIVE_TO_SUBMERSIBLE;
 
     // Define our start pose
+
+    public static double targetX = 24;
+    public static double targetY = 48;
+    public static double targetHeading = 25;
+
     // This assumes we start at x: 15, y: 10, heading: 180 degrees
     Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0,0, AngleUnit.DEGREES,0);
-    public static Pose2D targetPose = new Pose2D(DistanceUnit.INCH, 24,0, AngleUnit.DEGREES,0);
+    Pose2D targetPose = new Pose2D(DistanceUnit.INCH, targetX,targetY, AngleUnit.DEGREES, targetHeading);
 
     @Override
     public void runOpMode() {
@@ -55,6 +56,8 @@ public class TestBotAuto extends LinearOpMode {
         //for sparkfun it looks like this
         robot.drivetrain.localizer.myOtos.setPosition(startPose);
 
+        robot.drivetrain.setTargetPose(targetPose);
+
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Waiting for Start");
         telemetry.update();
@@ -64,9 +67,7 @@ public class TestBotAuto extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             switch (currentState){
                 case DRIVE_TO_SUBMERSIBLE:
-                    robot.drivetrain.setTargetPose(targetPose);
-
-                    //put condition for switch at the end, condition can be based on time or completion of a task
+                    //put condition for switch at the beginning, condition can be based on time or completion of a task
                     if(robot.drivetrain.targetReached){
                         currentState = State.DELIVER_SPECIMEN;
                         timer.reset();
@@ -75,17 +76,21 @@ public class TestBotAuto extends LinearOpMode {
                 case DELIVER_SPECIMEN:
                     if(timer.seconds() > 2.0){
                         currentState = State.PARK;
+                        robot.drivetrain.setTargetPose(startPose);
                     }
                     break;
                 case PARK:
-                    robot.drivetrain.setTargetPose(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES,0));
-
                     if(robot.drivetrain.targetReached){
                         currentState = State.IDLE;
+                        timer.reset();
                     }
                     break;
                 case IDLE:
-                    robot.stop();
+                    if(timer.seconds() > 2){
+                        currentState = State.DRIVE_TO_SUBMERSIBLE;
+                        robot.drivetrain.setTargetPose(new Pose2D(DistanceUnit.INCH, targetX, targetY, AngleUnit.DEGREES,targetHeading));
+                    }
+                    break;
             }
 
             // Anything outside of the switch statement will run independent of the currentState

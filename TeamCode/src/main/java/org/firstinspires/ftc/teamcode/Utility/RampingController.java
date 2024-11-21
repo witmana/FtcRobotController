@@ -6,6 +6,7 @@ public class RampingController {
     private double rampUpRate;
     private double rampDownRate;
     private double threshold;
+    private double speed;
 
     public boolean targetReached;
 
@@ -17,6 +18,7 @@ public class RampingController {
         this.rampDownRate = rampDownRate;
         this.threshold = threshold;
         this.targetReached = false;
+        speed = 0;
     }
 
     public double calculate(double targetPosition, double currentPosition) {
@@ -26,17 +28,21 @@ public class RampingController {
         //check if target has been reached
         if (distanceToTarget <= threshold) {
             targetReached = true;
+            speed = 0;
             return 0;
+        }else{
+            targetReached = false;
         }
 
-        double speed;
+
 
         //ramp down phase
-        if (distanceToTarget <= maxSpeed / rampDownRate) {
+        if (Math.abs(distanceToTarget) <= maxSpeed / rampDownRate) {
             speed = distanceToTarget * rampDownRate;
-        } else {
+        } else if (speed < maxSpeed){
+            speed+=rampUpRate;
             //ramp up phase or cruising at max speed
-            speed = Math.abs(currentPosition - targetPosition) * rampUpRate;
+            //speed = Math.abs(currentPosition - targetPosition) * rampUpRate;
         }
 
         //clamp the speed between the minSpeed and maxSpeed
