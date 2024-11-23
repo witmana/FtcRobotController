@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,12 +9,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Utility.PIDController;
-import org.firstinspires.ftc.teamcode.Utility.PinPointLocalizer;
 import org.firstinspires.ftc.teamcode.Utility.Pose2D;
 import org.firstinspires.ftc.teamcode.Utility.SparkfunLocalizer;
 
+import java.util.Locale;
+
 @Config
-public class Drivetrain {
+public class Drivetrain{
     /* Declare OpMode members. */
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
 
@@ -33,24 +35,27 @@ public class Drivetrain {
     public DcMotor leftBackDrive = null;
 
     //PID controllers for moving to target pose
-    PIDController xPID;
-    PIDController yPID;
-    PIDController headingPID;
+    PIDController xController;
+    PIDController yController;
+    PIDController headingController;
 
     public boolean targetReached = false;
     Pose2D targetPose;
 
     //Static Variables
     //TODO Adjust drive constants based on auto performance
-    public static double HEADING_KP = 0.01;
+
+    public static double HEADING_KP = 0.015;
     public static double HEADING_KI = 0.0;
     public static double HEADING_KD = 0.0;
-    public static double DRIVE_KP = 0.01;
+    public static double DRIVE_KP = 0.05;
     public static double DRIVE_KI = 0.0;
-    public static double DRIVE_KD = 0;//0.0003;
-    public static double DRIVE_MAX_ACC = 2000;
-    public static double DRIVE_MAX_VEL = 3500;
-    public static double DRIVE_MAX_OUT = 0.95;
+    public static double DRIVE_KD = 0.01;//0.0003;
+    public static double DRIVE_MAX_OUT = 0.7;
+    //public static double DRIVE_MAX_ACC = 2000;
+    //public static double DRIVE_MAX_VEL = 3500;
+
+
 
     public Drivetrain(LinearOpMode opmode) {
         myOpMode = opmode;
@@ -58,19 +63,22 @@ public class Drivetrain {
 
     public void init() {
         //Initialize PID controllers
-        xPID = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, DRIVE_MAX_OUT);
-        yPID = new PIDController(DRIVE_KP, DRIVE_KI, DRIVE_KD, DRIVE_MAX_OUT);
-        headingPID = new PIDController(HEADING_KP, HEADING_KI, HEADING_KD,DRIVE_MAX_OUT);
-
-        xPID.maxOut = DRIVE_MAX_OUT;
-        yPID.maxOut = DRIVE_MAX_OUT;
-        headingPID.maxOut = DRIVE_MAX_OUT;
+        //xController = new RampingController(MAX_SPEED, MIN_SPEED, RAMP_UP_RATE, RAMP_DOWN_RATE, THRESHOLD);
+        //yController = new RampingController(MAX_SPEED, MIN_SPEED, RAMP_UP_RATE, RAMP_DOWN_RATE, THRESHOLD);
+        //headingController = new RampingController(MAX_SPEED, MIN_SPEED, RAMP_UP_RATE, RAMP_DOWN_RATE, THRESHOLD);
+        xController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD, DRIVE_MAX_OUT);
+        yController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD,DRIVE_MAX_OUT);
+        headingController = new PIDController(HEADING_KP,HEADING_KI,HEADING_KD,DRIVE_MAX_OUT);
 
         //TODO Change constructor based on localization system
         //localizer = new PinPointLocalizer(myOpMode);
         localizer = new SparkfunLocalizer(myOpMode);
 
         localizer.init();
+
+        //TODO Set the offset of the localizer sensor
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(5, 0, 0);
+        localizer.myOtos.setOffset(offset);
 
         leftFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "leftFrontDrive");
         rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "rightFrontDrive");
@@ -169,17 +177,18 @@ public class Drivetrain {
 
     public void update(){
 
-        //double thetaTarget = Math.toRadians(degreeTarget);
         //Use PIDs to calculate motor powers based on error to targets
-        double xPower = xPID.calculate(targetPose.getX(DistanceUnit.INCH), localizer.pos.x);
-        double yPower = yPID.calculate(targetPose.getY(DistanceUnit.INCH), localizer.pos.y);
+        double xPower = xController.calculate(targetPose.getX(DistanceUnit.INCH), localizer.getX());
+        double yPower = yController.calculate(targetPose.getY(DistanceUnit.INCH), localizer.getY());
 
-        //double wrappedAngle = angleWrap(thetaTarget - localizer.heading);
-        double tPower = headingPID.calculate(targetPose.getHeading(AngleUnit.DEGREES),localizer.pos.h);
+        double wrappedAngleError = angleWrap(targetPose.getHeading(AngleUnit.DEGREES) - localizer.getHeading());
+        double tPower = headingController.calculate(wrappedAngleError);
+
+        double radianHeading = Math.toRadians(localizer.getHeading());
 
         //rotate the motor powers based on robot heading
-        double xPower_rotated = xPower * Math.cos(-localizer.pos.h) - yPower * Math.sin(-localizer.pos.h);
-        double yPower_rotated = xPower * Math.sin(-localizer.pos.h) + yPower * Math.cos(-localizer.pos.h);
+        double xPower_rotated = xPower * Math.cos(-radianHeading) - yPower * Math.sin(-radianHeading);
+        double yPower_rotated = xPower * Math.sin(-radianHeading) + yPower * Math.cos(-radianHeading);
 
         // x, y, theta input mixing to deliver motor powers
         leftFrontDrive.setPower(xPower_rotated - yPower_rotated - tPower);
@@ -188,8 +197,16 @@ public class Drivetrain {
         rightBackDrive.setPower(xPower_rotated - yPower_rotated + tPower);
 
         //check if drivetrain is still working towards target
-        targetReached = xPID.targetReached && yPID.targetReached && headingPID.targetReached;
+        targetReached = (xController.targetReached && yController.targetReached && headingController.targetReached);
+        String data = String.format(Locale.US, "{tX: %.3f, tY: %.3f, tH: %.3f}", targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH), targetPose.getHeading(AngleUnit.DEGREES));
 
+        myOpMode.telemetry.addData("Target Position", data);
+        myOpMode.telemetry.addData("XReached", xController.targetReached);
+        myOpMode.telemetry.addData("YReached", yController.targetReached);
+        myOpMode.telemetry.addData("HReached", headingController.targetReached);
+        myOpMode.telemetry.addData("targetReached", targetReached);
+        myOpMode.telemetry.addData("xPower", xPower);
+        myOpMode.telemetry.addData("xPowerRotated", xPower_rotated);
         localizer.update();
     }
 
@@ -200,18 +217,20 @@ public class Drivetrain {
 
     public void driveToPose(double xTarget, double yTarget, double degreeTarget) {
         //check if drivetrain is still working towards target
-        targetReached = xPID.targetReached && yPID.targetReached && headingPID.targetReached;
+        targetReached = xController.targetReached && yController.targetReached && headingController.targetReached;
         //double thetaTarget = Math.toRadians(degreeTarget);
         //Use PIDs to calculate motor powers based on error to targets
-        double xPower = xPID.calculate(xTarget, localizer.pos.x);
-        double yPower = yPID.calculate(yTarget, localizer.pos.y);
+        double xPower = xController.calculate(xTarget, localizer.getX());
+        double yPower = yController.calculate(yTarget, localizer.getY());
 
-        //double wrappedAngle = angleWrap(thetaTarget - localizer.heading);
-        double tPower = headingPID.calculate(degreeTarget,localizer.pos.h);
+        double wrappedAngleError = angleWrap(degreeTarget - localizer.getHeading());
+        double tPower = headingController.calculate(wrappedAngleError);
+
+        double radianHeading = Math.toRadians(localizer.getHeading());
 
         //rotate the motor powers based on robot heading
-        double xPower_rotated = xPower * Math.cos(-localizer.pos.h) - yPower * Math.sin(-localizer.pos.h);
-        double yPower_rotated = xPower * Math.sin(-localizer.pos.h) + yPower * Math.cos(-localizer.pos.h);
+        double xPower_rotated = xPower * Math.cos(-radianHeading) - yPower * Math.sin(-radianHeading);
+        double yPower_rotated = xPower * Math.sin(-radianHeading) + yPower * Math.cos(-radianHeading);
 
         // x, y, theta input mixing to deliver motor powers
         leftFrontDrive.setPower(xPower_rotated - yPower_rotated - tPower);
@@ -225,5 +244,19 @@ public class Drivetrain {
         leftBackDrive.setPower(0);
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
+    }
+
+    // This function normalizes the angle so it returns a value between -180° and 180° instead of 0° to 360°.
+    public double angleWrap(double degrees) {
+
+        while (degrees > 180) {
+            degrees -= 360;
+        }
+        while (degrees < -180) {
+            degrees += 360;
+        }
+
+        // keep in mind that the result is in degrees
+        return degrees;
     }
 }
