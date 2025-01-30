@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TestBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -12,6 +13,7 @@ public class TestBotHardware {
 
         //TODO Add instance of Vision subsystem...either Webcam, HuskyLens, or Limelight
         public TestBotDrivetrain drivetrain;
+        public Servo extension;
 
 
         // Define a constructor that allows the OpMode to pass a reference to itself.
@@ -23,6 +25,8 @@ public class TestBotHardware {
             drivetrain = new TestBotDrivetrain(myOpMode);
 
             drivetrain.init();
+
+            extension = myOpMode.hardwareMap.get(Servo.class, "extension");
 
             myOpMode.telemetry.addData(">", "Hardware Initialized");
         }
