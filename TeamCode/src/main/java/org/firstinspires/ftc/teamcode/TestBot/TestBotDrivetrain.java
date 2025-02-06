@@ -188,7 +188,7 @@ public class TestBotDrivetrain {
     }
 
     public void update(){
-
+        /*
         //Use PIDs to calculate motor powers based on error to targets
         double xPower = xController.calculate(targetPose.getX(DistanceUnit.INCH), localizer.getX());
         double yPower = yController.calculate(targetPose.getY(DistanceUnit.INCH), localizer.getY());
@@ -219,6 +219,8 @@ public class TestBotDrivetrain {
         myOpMode.telemetry.addData("targetReached", targetReached);
         myOpMode.telemetry.addData("xPower", xPower);
         myOpMode.telemetry.addData("xPowerRotated", xPower_rotated);
+
+         */
         localizer.update();
     }
 
@@ -230,6 +232,7 @@ public class TestBotDrivetrain {
 
 
     public void driveToPose(double xTarget, double yTarget, double degreeTarget) {
+        targetPose = new Pose2D(DistanceUnit.INCH, xTarget,yTarget,AngleUnit.DEGREES,degreeTarget);
         //check if drivetrain is still working towards target
         targetReached = xController.targetReached && yController.targetReached && headingController.targetReached;
         //double thetaTarget = Math.toRadians(degreeTarget);
@@ -251,6 +254,14 @@ public class TestBotDrivetrain {
         leftBackDrive.setPower(xPower_rotated + yPower_rotated - tPower);
         rightFrontDrive.setPower(xPower_rotated + yPower_rotated + tPower);
         rightBackDrive.setPower(xPower_rotated - yPower_rotated + tPower);
+
+        String data = String.format(Locale.US, "{tX: %.3f, tY: %.3f, tH: %.3f}", targetPose.getX(DistanceUnit.INCH), targetPose.getY(DistanceUnit.INCH), targetPose.getHeading(AngleUnit.DEGREES));
+
+        myOpMode.telemetry.addData("Target Position", data);
+        myOpMode.telemetry.addData("XReached", xController.targetReached);
+        myOpMode.telemetry.addData("YReached", yController.targetReached);
+        myOpMode.telemetry.addData("HReached", headingController.targetReached);
+        myOpMode.telemetry.addData("targetReached", targetReached);
     }
 
     public void stop(){
@@ -262,7 +273,6 @@ public class TestBotDrivetrain {
 
     // This function normalizes the angle so it returns a value between -180° and 180° instead of 0° to 360°.
     public double angleWrap(double degrees) {
-
         while (degrees > 180) {
             degrees -= 360;
         }

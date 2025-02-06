@@ -27,7 +27,6 @@ public class Drivetrain{
 
     ElapsedTime time = new ElapsedTime();
 
-
     //drivetrain motors
     public DcMotor rightFrontDrive = null;
     public DcMotor leftFrontDrive = null;
@@ -40,6 +39,7 @@ public class Drivetrain{
     PIDController headingController;
 
     public boolean targetReached = false;
+
     Pose2D targetPose;
 
     //Static Variables

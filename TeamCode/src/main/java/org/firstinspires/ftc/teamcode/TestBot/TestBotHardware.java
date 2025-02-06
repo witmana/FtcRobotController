@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.TestBot;
 
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 
 public class TestBotHardware {
         /* Declare OpMode members. */
@@ -15,6 +15,8 @@ public class TestBotHardware {
         public TestBotDrivetrain drivetrain;
         public Servo extension;
 
+        public HuskyLens huskyLens;
+        double servoPosition = 0.25;
 
         // Define a constructor that allows the OpMode to pass a reference to itself.
         public TestBotHardware(LinearOpMode opmode) {
@@ -22,6 +24,9 @@ public class TestBotHardware {
         }
 
         public void init() {
+            huskyLens = myOpMode.hardwareMap.get(HuskyLens.class, "huskylens");
+            huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
+
             drivetrain = new TestBotDrivetrain(myOpMode);
 
             drivetrain.init();
@@ -44,12 +49,12 @@ public class TestBotHardware {
 
         public void update(){
             drivetrain.update();
+            extension.setPosition(servoPosition);
         }
 
         public void stop(){
             drivetrain.stop();
         }
-
 }
 
 
