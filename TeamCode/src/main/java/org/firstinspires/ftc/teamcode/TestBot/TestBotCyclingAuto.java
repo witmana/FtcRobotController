@@ -32,13 +32,14 @@ public class TestBotCyclingAuto extends LinearOpMode {
         RETRIEVE_FLOOR_SAMPLE,
         DRIVE_TO_SUBMERSIBLE,
         RETRIEVE_SUBMERSIBLE_SAMPLE,
+        DRIVE_TO_BASKET_FROM_SUBMERSIBLE,
         PARK,
         IDLE
     }
 
     //Constants so these can be tuned in the dashboard
-    public static double basketX = 12;
-    public static double basketY = 12;
+    public static double basketX = 8;
+    public static double basketY = 10;
     public static double basketHeading = -45;
 
     public static double floorSampleX = 24;
@@ -94,34 +95,34 @@ public class TestBotCyclingAuto extends LinearOpMode {
                 case DRIVE_TO_BASKET:
                     robot.drivetrain.driveToPose(basketX, basketY,basketHeading);
                     //put condition for switch at the end, condition can be based on time or completion of a task
-                    if(robot.drivetrain.targetReached || timer.seconds() > 2){
+                    if(robot.drivetrain.targetReached || timer.seconds() > 1.5){
                         switchState(State.DELIVER_SAMPLE);
                     }
                     break;
                 case DELIVER_SAMPLE:
                     robot.drivetrain.driveToPose(basketX, basketY,basketHeading);
-                    if(timer.seconds() > 2.0 && samplesScored < 2){
-                        switchState(State.RETRIEVE_FLOOR_SAMPLE);
+                    if(timer.seconds() > 1.5 && samplesScored < 3){
+                        switchState(State.DRIVE_TO_FLOOR_SAMPLE);
                         samplesScored++;
-                    }else if(timer.seconds() >2.0){
+                    }else if(timer.seconds() >1.5){
                         switchState(State.DRIVE_TO_SUBMERSIBLE);
                         samplesScored++;
                     }
                     break;
                 case DRIVE_TO_FLOOR_SAMPLE:
-                    robot.drivetrain.driveToPose(floorSampleX, floorSampleY + samplesScored*6,floorSampleHeading+samplesScored*15);
-                    if(robot.drivetrain.targetReached || timer.seconds() > 2.0){
+                    telemetry.addData("expression", floorSampleY+samplesScored*6.0);
+                    robot.drivetrain.driveToPose(floorSampleX, floorSampleY + (samplesScored-1)*6.0,floorSampleHeading+(samplesScored-1)*15.0);
+                    if(timer.seconds() > 1.5){
                         switchState(State.RETRIEVE_FLOOR_SAMPLE);
                     }
                     break;
                 case RETRIEVE_FLOOR_SAMPLE:
                     if(timer.seconds() < 1) {
-                        robot.extension.setPosition(0.5);
+                        robot.servoPosition = 0.5;
                     }else{
-                        robot.extension.setPosition(0.25);
+                        robot.servoPosition = 0.25;
                     }
-                    robot.drivetrain.driveToPose(floorSampleX, floorSampleY,floorSampleHeading);
-                    if(timer.seconds() > 2.0){
+                    if(timer.seconds() > 1.5){
                         switchState(State.DRIVE_TO_BASKET);
                     }
                     break;
@@ -131,14 +132,23 @@ public class TestBotCyclingAuto extends LinearOpMode {
                     }else{
                         robot.drivetrain.driveToPose(submersibleX, submersibleY,submersibleHeading);
                     }
-                    if(robot.drivetrain.targetReached || timer.seconds() > 2.5){
+
+                    if(timer.seconds() > 2.5){
                         switchState(State.RETRIEVE_SUBMERSIBLE_SAMPLE);
                     }
                     break;
                 case RETRIEVE_SUBMERSIBLE_SAMPLE:
-                    robot.drivetrain.driveToPose(submersibleX, submersibleY,submersibleHeading);
+                    robot.alignWithSample();
                     if(timer.seconds() > 2.0){
-                        switchState(State.DRIVE_TO_BASKET);
+                        robot.servoPosition = 0.25;
+                        switchState(State.DRIVE_TO_BASKET_FROM_SUBMERSIBLE);
+                    }
+                    break;
+                case DRIVE_TO_BASKET_FROM_SUBMERSIBLE:
+                    robot.drivetrain.driveToPose(basketX, basketY,basketHeading);
+                    //put condition for switch at the end, condition can be based on time or completion of a task
+                    if(robot.drivetrain.targetReached || timer.seconds() > 3){
+                        switchState(State.DELIVER_SAMPLE);
                     }
                     break;
                 case PARK:
@@ -164,6 +174,7 @@ public class TestBotCyclingAuto extends LinearOpMode {
 
     void switchState(State newState){
         currentState = newState;
+        robot.drivetrain.targetReached = false;
         timer.reset();
     }
 

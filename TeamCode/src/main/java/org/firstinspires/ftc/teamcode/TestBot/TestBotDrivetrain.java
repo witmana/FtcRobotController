@@ -53,7 +53,7 @@ public class TestBotDrivetrain {
     public static double DRIVE_KD = 0.01;//0.0003;
     public static double DRIVE_MAX_ACC = 2000;
     public static double DRIVE_MAX_VEL = 3500;
-    public static double DRIVE_MAX_OUT = 0.7;
+    public static double DRIVE_MAX_OUT = 0.8;
 
     /*
     public static double MAX_SPEED = .5;

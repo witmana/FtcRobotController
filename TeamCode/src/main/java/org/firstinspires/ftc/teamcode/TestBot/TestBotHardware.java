@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Utility.PIDController;
+
 public class TestBotHardware {
         /* Declare OpMode members. */
         private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
@@ -51,6 +53,39 @@ public class TestBotHardware {
             drivetrain.update();
             extension.setPosition(servoPosition);
         }
+
+    public void alignWithSample(){
+        double xTarget = 200;
+        double rightMostX = 0;
+        int rightMostIndex = 0;
+        PIDController strafeController;
+        strafeController = new PIDController(TestBotDrivetrain.DRIVE_KP, TestBotDrivetrain.DRIVE_KI, TestBotDrivetrain.DRIVE_KD, TestBotDrivetrain.DRIVE_MAX_OUT);
+        HuskyLens.Block[] blocks = huskyLens.blocks();
+        myOpMode.telemetry.addData("Block count", blocks.length);
+        for (int i = 0; i < blocks.length; i++) {
+            myOpMode.telemetry.addData("Block", blocks[i].toString());
+            if(blocks[i].x > rightMostX){
+                rightMostX = blocks[i].x;
+                rightMostIndex = i;
+                servoPosition = (424.53-blocks[i].y)/380.74;
+            }
+
+        }
+        myOpMode.telemetry.addData("RightMostX", rightMostX);
+        if(rightMostX < xTarget){
+            double strafePower = strafeController.calculate(xTarget, rightMostX);
+            drivetrain.leftFrontDrive.setPower(-strafePower);
+            drivetrain.leftBackDrive.setPower(strafePower);
+            drivetrain.rightFrontDrive.setPower(strafePower);
+            drivetrain.rightBackDrive.setPower(-strafePower);
+            myOpMode.telemetry.addData("StrafePower", strafePower);
+        }else{
+            drivetrain.leftFrontDrive.setPower(0);
+            drivetrain.leftBackDrive.setPower(0);
+            drivetrain.rightFrontDrive.setPower(0);
+            drivetrain.rightBackDrive.setPower(0);
+        }
+    }
 
         public void stop(){
             drivetrain.stop();
